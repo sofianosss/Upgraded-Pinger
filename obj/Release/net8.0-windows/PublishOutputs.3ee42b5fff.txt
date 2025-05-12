@@ -1,0 +1,11 @@
+D:\My Apps\Upgraded Pinger.exe
+D:\My Apps\assets\alert.wav
+D:\My Apps\assets\internet.ico
+D:\My Apps\assets\loop.wav
+D:\My Apps\Upgraded Pinger.dll
+D:\My Apps\Upgraded Pinger.deps.json
+D:\My Apps\Upgraded Pinger.runtimeconfig.json
+D:\My Apps\Upgraded Pinger.pdb
+D:\My Apps\System.CodeDom.dll
+D:\My Apps\System.Management.dll
+D:\My Apps\runtimes\win\lib\net8.0\System.Management.dll

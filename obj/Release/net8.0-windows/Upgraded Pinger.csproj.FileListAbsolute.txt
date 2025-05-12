@@ -1,0 +1,28 @@
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\assets\alert.wav
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\assets\internet.ico
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\assets\loop.wav
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\Upgraded Pinger.exe
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\Upgraded Pinger.deps.json
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\Upgraded Pinger.runtimeconfig.json
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\Upgraded Pinger.dll
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\Upgraded Pinger.pdb
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\System.CodeDom.dll
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\System.Management.dll
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Release\net8.0-windows\runtimes\win\lib\net8.0\System.Management.dll
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.csproj.AssemblyReference.cache
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\MainWindow.g.cs
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\App.g.cs
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger_MarkupCompile.cache
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger_MarkupCompile.lref
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\MainWindow.baml
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.g.resources
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.AssemblyInfoInputs.cache
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.AssemblyInfo.cs
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.csproj.CoreCompileInputs.cache
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded.73147848.Up2Date
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.dll
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\refint\Upgraded Pinger.dll
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.pdb
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.genruntimeconfig.cache
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\ref\Upgraded Pinger.dll

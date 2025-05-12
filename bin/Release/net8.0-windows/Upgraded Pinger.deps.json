@@ -1,0 +1,67 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Upgraded Pinger/1.0.0": {
+        "dependencies": {
+          "System.Management": "10.0.0-preview.3.25171.5"
+        },
+        "runtime": {
+          "Upgraded Pinger.dll": {}
+        }
+      },
+      "System.CodeDom/10.0.0-preview.3.25171.5": {
+        "runtime": {
+          "lib/net8.0/System.CodeDom.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.17105"
+          }
+        }
+      },
+      "System.Management/10.0.0-preview.3.25171.5": {
+        "dependencies": {
+          "System.CodeDom": "10.0.0-preview.3.25171.5"
+        },
+        "runtime": {
+          "lib/net8.0/System.Management.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.17105"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net8.0/System.Management.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.17105"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Upgraded Pinger/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "System.CodeDom/10.0.0-preview.3.25171.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GGd3KvdvegjatYwNEzfEZ8q0zLotqVcMDKfxLAi2vSS/lql5WdO5pZXkD6+tnKltR1Hk+Ca8AmcRLRPIOxkZgQ==",
+      "path": "system.codedom/10.0.0-preview.3.25171.5",
+      "hashPath": "system.codedom.10.0.0-preview.3.25171.5.nupkg.sha512"
+    },
+    "System.Management/10.0.0-preview.3.25171.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dYFVqacUM76bZlVqTkpV/VNOevN2RH1bhqBjQ5Vp8aULQ4PeRuD71nfPzrYMdpvjnEj4PdLF9s395fE/7qWYEA==",
+      "path": "system.management/10.0.0-preview.3.25171.5",
+      "hashPath": "system.management.10.0.0-preview.3.25171.5.nupkg.sha512"
+    }
+  }
+}

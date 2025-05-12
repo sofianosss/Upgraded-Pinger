@@ -1,0 +1,82 @@
+﻿<Window x:Class="Upgraded_Pinger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Upgraded_Pinger"
+        mc:Ignorable="d"
+        Title="Upgraded Pinger" Height="600" Width="400"
+        Closed="Window_Closed">
+    <Grid>
+        <!-- Purple-Blue Gradient Background -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF6E00FF" Offset="0"/>
+                <GradientStop Color="#FF0038FF" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Main Content Container -->
+        <StackPanel Margin="20" VerticalAlignment="Center">
+            <TextBlock Text="Ping adresses:" Foreground="White" HorizontalAlignment="Left" />
+            <!-- Input Fields Section -->
+            <ItemsControl ItemsSource="{Binding PingTargets}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                            <!-- Name Label -->
+                            <Label Content="{Binding Name}" Width="100" Foreground="White" FontWeight="Bold"/>
+
+                            <!-- IP Address TextBox -->
+                            <TextBox Text="{Binding IpAddress}" Width="120" Margin="10,0" Padding="5" IsEnabled="{Binding IsEnabled}"/>
+
+                            <!-- Ping Value Label -->
+                            <Label Content="{Binding PingValue}" Width="60" Foreground="White" Margin="10,0" 
+                                   HorizontalContentAlignment="Right" FontWeight="Bold"/>
+
+                            <!-- Status Indicator -->
+                            <Ellipse Width="12" Height="12" Margin="10,0" Fill="{Binding StatusColor}" 
+                                     Stroke="White" StrokeThickness="1"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Buttons Section -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30">
+                <Button Content="Start" Width="70" Height="30" Margin="5,0" 
+            Background="#FF4CAF50" Foreground="White" Click="StartPinging_Click"/>
+                <Button Content="Stop" Width="70" Height="30" Margin="5,0" 
+            Background="#FFF44336" Foreground="White" Click="StopPinging_Click"/>
+                <Button Content="Enable" Width="70" Height="30" Margin="5,0" 
+            Background="#FF2196F3" Foreground="White" Click="EnableEthernet1_Click"/>
+                <Button Content="Disable" Width="70" Height="30" Margin="5,0" 
+            Background="#FFFF9800" Foreground="White" Click="DisableEthernet1_Click"/>
+            </StackPanel>
+
+            <TextBlock x:Name="adapters_Count" Text="Number on active Ethernet adapters:" Foreground="White" HorizontalAlignment="Center"/>
+
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
+                <!-- Timeout Counter Display -->
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,20">
+                    <TextBlock Text="Tolerance" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBox x:Name="Tolerance_Input" TextAlignment="Center" Text="6" Width="50" Margin="10,0" Padding="5" HorizontalAlignment="Center"/>
+                </StackPanel>
+                <!-- Timeout Counter Display -->
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,20">
+                <TextBlock Text="Timeouts (last 3s)" Foreground="White" HorizontalAlignment="Center"/>
+                <ProgressBar x:Name="TimeoutProgressBar" Width="300" Height="20" Maximum="15" Value="0" Margin="0,5"/>
+                <TextBlock x:Name="TimeoutLabel" Foreground="White" HorizontalAlignment="Center"/>
+            </StackPanel>
+            </StackPanel>
+
+            <!-- back online timer -->
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,20">
+                <TextBlock Text="Timer to reconnect" Foreground="White" HorizontalAlignment="Center"/>
+                <ProgressBar x:Name="TimerToBeBack" Width="350" Height="20" Maximum="120" Value="120" Margin="0,5"/>
+                <TextBlock x:Name="TimerToBeBack_txt" Foreground="White" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
