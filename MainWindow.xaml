@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Upgraded_Pinger"
         mc:Ignorable="d"
-        Title="Upgraded Pinger" Height="600" Width="400"
+        Title="Upgraded Pinger" Height="400" Width="400"
         Closed="Window_Closed">
     <Grid>
         <!-- Purple-Blue Gradient Background -->
@@ -17,25 +17,24 @@
         </Grid.Background>
 
         <!-- Main Content Container -->
-        <StackPanel Margin="20" VerticalAlignment="Center">
-            <TextBlock Text="Ping adresses:" Foreground="White" HorizontalAlignment="Left" />
-            <!-- Input Fields Section -->
+        <StackPanel Margin="5" VerticalAlignment="Center">
+         <!-- Input Fields Section -->
             <ItemsControl ItemsSource="{Binding PingTargets}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                        <StackPanel Orientation="Horizontal" Margin="0,0">
                             <!-- Name Label -->
                             <Label Content="{Binding Name}" Width="100" Foreground="White" FontWeight="Bold"/>
 
                             <!-- IP Address TextBox -->
-                            <TextBox Text="{Binding IpAddress}" Width="120" Margin="10,0" Padding="5" IsEnabled="{Binding IsEnabled}"/>
+                            <TextBox Text="{Binding IpAddress}" Width="160" Height="18" Margin="5,0" Padding="0" IsEnabled="{Binding IsEnabled}" FontSize="10"/>
 
                             <!-- Ping Value Label -->
-                            <Label Content="{Binding PingValue}" Width="60" Foreground="White" Margin="10,0" 
+                            <Label Content="{Binding PingValue}" Width="60" Foreground="White" Margin="0,0" 
                                    HorizontalContentAlignment="Right" FontWeight="Bold"/>
 
                             <!-- Status Indicator -->
-                            <Ellipse Width="12" Height="12" Margin="10,0" Fill="{Binding StatusColor}" 
+                            <Ellipse Width="12" Height="12" Margin="5,0" Fill="{Binding StatusColor}" 
                                      Stroke="White" StrokeThickness="1"/>
                         </StackPanel>
                     </DataTemplate>
@@ -43,39 +42,41 @@
             </ItemsControl>
 
             <!-- Buttons Section -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
                 <Button Content="Start" Width="70" Height="30" Margin="5,0" 
-            Background="#FF4CAF50" Foreground="White" Click="StartPinging_Click"/>
+            Background="#782196F3" Foreground="White" Click="StartPinging_Click"/>
                 <Button Content="Stop" Width="70" Height="30" Margin="5,0" 
-            Background="#FFF44336" Foreground="White" Click="StopPinging_Click"/>
+            Background="#782196F3" Foreground="White" Click="StopPinging_Click"/>
                 <Button Content="Enable" Width="70" Height="30" Margin="5,0" 
             Background="#FF2196F3" Foreground="White" Click="EnableEthernet1_Click"/>
                 <Button Content="Disable" Width="70" Height="30" Margin="5,0" 
-            Background="#FFFF9800" Foreground="White" Click="DisableEthernet1_Click"/>
+            Background="#FF2196F3" Foreground="White" Click="DisableEthernet1_Click"/>
             </StackPanel>
 
             <TextBlock x:Name="adapters_Count" Text="Number on active Ethernet adapters:" Foreground="White" HorizontalAlignment="Center"/>
 
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
                 <!-- Timeout Counter Display -->
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,20">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,5">
                     <TextBlock Text="Tolerance" Foreground="White" HorizontalAlignment="Center"/>
-                    <TextBox x:Name="Tolerance_Input" TextAlignment="Center" Text="6" Width="50" Margin="10,0" Padding="5" HorizontalAlignment="Center"/>
+                    <TextBox x:Name="Tolerance_Input" TextAlignment="Center" Text="6" Width="60" Margin="10,0" Padding="5" HorizontalAlignment="Center"/>
+                    <CheckBox x:Name="killChrome" Foreground="White" FontSize="8" Content="Kill Chrome" HorizontalAlignment="Center" IsChecked="True"/>
+
+
                 </StackPanel>
                 <!-- Timeout Counter Display -->
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,20">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,5" Background="#d17615">
                 <TextBlock Text="Timeouts (last 3s)" Foreground="White" HorizontalAlignment="Center"/>
-                <ProgressBar x:Name="TimeoutProgressBar" Width="300" Height="20" Maximum="15" Value="0" Margin="0,5"/>
+                <ProgressBar x:Name="TimeoutProgressBar" Width="280" Height="20" Maximum="15" Value="0" Margin="10,5,10,5"/>
                 <TextBlock x:Name="TimeoutLabel" Foreground="White" HorizontalAlignment="Center"/>
             </StackPanel>
             </StackPanel>
 
             <!-- back online timer -->
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,20">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,5" Background="#d17615">
                 <TextBlock Text="Timer to reconnect" Foreground="White" HorizontalAlignment="Center"/>
-                <ProgressBar x:Name="TimerToBeBack" Width="350" Height="20" Maximum="120" Value="120" Margin="0,5"/>
-                <TextBlock x:Name="TimerToBeBack_txt" Foreground="White" HorizontalAlignment="Center"/>
+                <ProgressBar x:Name="TimerToBeBack" Width="350" Height="20" Maximum="120" Value="120" Margin="10,5,10,10"/>
             </StackPanel>
         </StackPanel>
     </Grid>

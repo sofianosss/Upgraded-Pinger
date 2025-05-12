@@ -41,7 +41,7 @@ namespace Upgraded_Pinger
                 new PingTarget { Name = "Router:", IpAddress = "192.168.1.1", PingValue = "-" }
             };
 
-            _timerManager = new TimerManager(TimerToBeBack, TimerToBeBack_txt);
+            _timerManager = new TimerManager(TimerToBeBack);
 
             _timeoutUpdateTimer = new DispatcherTimer
             {
@@ -214,6 +214,11 @@ namespace Upgraded_Pinger
                     _isPingingStopped = true;
                     _timerManager.StartTimer();
                     PlayAlertThenStartLoop();
+                    if (killChrome.IsChecked == true)
+                    {
+                        CloseChrome();
+                    }
+
                 }
             }
         }
@@ -297,10 +302,9 @@ namespace Upgraded_Pinger
             private int _secondsRemaining;
             private const int TotalSeconds = 120;
 
-            public TimerManager(ProgressBar progressBar, TextBlock textBlock)
+            public TimerManager(ProgressBar progressBar)
             {
                 _progressBar = progressBar;
-                _textBlock = textBlock;
                 InitializeTimer();
             }
 
@@ -308,7 +312,6 @@ namespace Upgraded_Pinger
             {
                 _progressBar.Value = 0;
                 _progressBar.Maximum = TotalSeconds;
-                _textBlock.Text = "2:00";
                 _secondsRemaining = TotalSeconds;
             }
 
@@ -344,7 +347,6 @@ namespace Upgraded_Pinger
                 _progressBar.Value = TotalSeconds - _secondsRemaining;
 
                 TimeSpan time = TimeSpan.FromSeconds(_secondsRemaining);
-                _textBlock.Text = string.Format("{0}:{1:D2}", time.Minutes, time.Seconds);
 
                 //Enabling ethernet based on timer
                 if (_secondsRemaining <= 3)
@@ -356,6 +358,54 @@ namespace Upgraded_Pinger
                 {
                     StopTimer();
                 }
+            }
+        }
+
+        public static void CloseChrome()
+        {
+            try
+            {
+                Process[] chromeProcesses = Process.GetProcessesByName("chrome");
+
+                if (chromeProcesses.Length == 0)
+                {
+                    Console.WriteLine("No Chrome process found.");
+                    return;
+                }
+
+                foreach (Process process in chromeProcesses)
+                {
+                    try
+                    {
+                        if (!process.HasExited)
+                        {
+                            process.Kill();
+                            // Optional: wait for it to close with timeout
+                            process.WaitForExit(5000); // Wait up to 5 seconds
+                            Console.WriteLine("Chrome process terminated.");
+                        }
+                    }
+                    catch (Win32Exception ex)
+                    {
+                        Console.WriteLine($"Could not terminate process (Win32): {ex.Message}");
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        Console.WriteLine($"Process already exited: {ex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error terminating process: {ex.Message}");
+                    }
+                    finally
+                    {
+                        process.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error in CloseChrome: {ex.Message}");
             }
         }
     }

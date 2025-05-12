@@ -26,3 +26,4 @@ C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upg
 C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.pdb
 C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.genruntimeconfig.cache
 C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\ref\Upgraded Pinger.dll
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Release\net8.0-windows\Upgraded Pinger.sourcelink.json

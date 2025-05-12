@@ -26,3 +26,4 @@ C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upg
 C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Debug\net8.0-windows\assets\alert.wav
 C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Debug\net8.0-windows\assets\loop.wav
 C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\bin\Debug\net8.0-windows\assets\internet.ico
+C:\Users\Valia\Documents\Projects Documents\Showcase Fiverr\C sharp App\0010 Upgraded Pinger\Upgraded Pinger\obj\Debug\net8.0-windows\Upgraded Pinger.sourcelink.json
