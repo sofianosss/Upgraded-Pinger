@@ -1,464 +1,535 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.IO;
-using System.Management;
+using System.Media;
 using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Reflection;
+using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using System.Windows.Controls;
 
 namespace Upgraded_Pinger
 {
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
-        private CancellationTokenSource _pingCancellationTokenSource;
-        private bool _isPinging;
-        private DispatcherTimer _timeoutUpdateTimer;
-        private const int TimeoutWindowSeconds = 3;
-        private int _timeoutThreshold = 6;
-        private bool _hasPlayedSound = false;
-        private System.Media.SoundPlayer _loopPlayer = null;
-        private bool _isPingingStopped = false;
-        private int _frozenTimeoutCount = 0;
-        private TimerManager _timerManager;
+        private static System.Timers.Timer? _timer;
+        private int _count = 0;
+        public bool pinging = false;
+
+        private string[] _ipAddresses = new string[5];
+        private readonly Queue<bool> _last15Results = new Queue<bool>(15);
+        private readonly Queue<bool> _last100Results = new Queue<bool>(100);
+        private int totalSeconds = 90;
+
 
         public MainWindow()
         {
             InitializeComponent();
 
-            PingTargets = new List<PingTarget>
+            _timer = new System.Timers.Timer(200);
+            _timer.Elapsed += every200msEvents;
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
+
+            ProtectionToggle.IsChecked = true;
+            EnableDisableEthernet.IsChecked = true;
+            KillChromeToggle.IsChecked = true;
+            ReconnectBTN.IsChecked = true;
+
+            adressIP1.Text = "8.8.8.8";
+            adressIP2.Text = "store.steampowered.com";
+            adressIP3.Text = "208.67.222.222";
+            adressIP4.Text = "104.16.1.5";
+            adressIP5.Text = "192.168.1.1";
+
+            // Copy IP texts safely on UI thread
+            Dispatcher.Invoke(() =>
             {
-                new PingTarget { Name = "Google:", IpAddress = "8.8.8.8", PingValue = "-" },
-                new PingTarget { Name = "Steam:", IpAddress = "store.steampowered.com", PingValue = "-" },
-                new PingTarget { Name = "xbox:", IpAddress = "20.236.44.162", PingValue = "-" },
-                new PingTarget { Name = "Riot:", IpAddress = "104.16.1.5", PingValue = "-" },
-                new PingTarget { Name = "Router:", IpAddress = "192.168.1.1", PingValue = "-" }
-            };
+                _ipAddresses[0] = adressIP1.Text;
+                _ipAddresses[1] = adressIP2.Text;
+                _ipAddresses[2] = adressIP3.Text;
+                _ipAddresses[3] = adressIP4.Text;
+                _ipAddresses[4] = adressIP5.Text;
+            });
 
-            _timerManager = new TimerManager(TimerToBeBack);
-
-            _timeoutUpdateTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(1)
-            };
-            _timeoutUpdateTimer.Tick += UpdateTimeoutProgress;
-
-            DataContext = this;
         }
 
-        public List<PingTarget> PingTargets { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void StartPinging_Click(object sender, RoutedEventArgs e)
+        // Main cycle: called every 200 ms
+        private void every200msEvents(object? source, ElapsedEventArgs e)
         {
-            StartPinging();
-        }
+            _count++;
+            int digit = _count % 10;
 
-        private void StartPinging()
-        {
-            _isPingingStopped = false;
-            _hasPlayedSound = false;
-            _frozenTimeoutCount = 0;
-            _timeoutUpdateTimer.Start();
-
-            if (_loopPlayer != null)
+            // Check Ethernet status every 2 seconds and play sound conditionally
+            if (digit == 0 || digit == 5)
             {
-                _loopPlayer.Stop();
-                _loopPlayer = null;
-            }
-
-            if (_isPinging) return;
-
-            _isPinging = true;
-            _pingCancellationTokenSource = new CancellationTokenSource();
-
-            try
-            {
-                var tasks = new List<Task>();
-                for (int i = 0; i < PingTargets.Count; i++)
+                Dispatcher.Invoke(() =>
                 {
-                    int index = i;
-                    int delay = i * 200;
-                    tasks.Add(PingContinuouslyAsync(index, delay, _pingCancellationTokenSource.Token));
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                // Expected when stopping
-            }
-        }
-
-        private async Task PingContinuouslyAsync(int targetIndex, int initialDelay, CancellationToken cancellationToken)
-        {
-            var target = PingTargets[targetIndex];
-            var ping = new Ping();
-
-            await Task.Delay(initialDelay, cancellationToken);
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    var reply = await ping.SendPingAsync(target.IpAddress, 1000);
-
-                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    if (digit == 0)
                     {
-                        if (reply.Status == IPStatus.Success)
+                        var status = CheckEthernetStatus();
+                        EnableDisableEthernet.Content = status;
+                    }
+                    else if (digit == 5 || digit == 8)
+                    {
+                        if (ActiveAdaptersLabel.Content?.ToString() == "1" &&
+                            EnableDisableEthernet.Content?.ToString() == "Disabled")
                         {
-                            target.PingValue = reply.RoundtripTime.ToString();
-                            target.StatusColor = Brushes.Green;
+                            string soundPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "loop.wav");
+
+                            if (File.Exists(soundPath) && digit == 5)
+                            {
+                                PlaySound(soundPath);
+                                if (totalSeconds <= 5)
+                                {
+                                    PlaySound(soundPath);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+
+            //Activities active only when pinging
+            if (pinging)
+            {
+                string? ip = null;
+                TextBlock? statusIndicator = null;
+                TextBlock? nextIndicator = null;
+
+                switch (digit)
+                {
+                    case 0:
+                    case 5:
+                        ip = _ipAddresses[0];
+                        nextIndicator = StatusIndicator1; //Next to ping
+                        statusIndicator = StatusIndicator0;
+                        break;
+                    case 1:
+                    case 6:
+                        ip = _ipAddresses[1];
+                        nextIndicator = StatusIndicator2; //Next to ping
+                        statusIndicator = StatusIndicator1;
+                        break;
+                    case 2:
+                    case 7:
+                        ip = _ipAddresses[2];
+                        nextIndicator = StatusIndicator3; //Next to ping
+                        statusIndicator = StatusIndicator2;
+                        break;
+                    case 3:
+                    case 8:
+                        ip = _ipAddresses[3];
+                        nextIndicator = StatusIndicator4; //Next to ping
+                        statusIndicator = StatusIndicator3;
+                        break;
+                    case 4:
+                    case 9:
+                        nextIndicator = StatusIndicator0;
+                        ip = _ipAddresses[4];
+                        statusIndicator = StatusIndicator4;
+                        break;
+                }
+
+                if (ip != null && statusIndicator != null && pinging)
+                {
+                    bool pingResult = PingAddress(ip);
+                    AddPingResult(pingResult); //function that tracks loss for 15 and 100 last pings
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        //Update every result with correct color and BAD or OK depending of loss or success
+                        nextIndicator.Foreground = new SolidColorBrush(Colors.Gray);
+                        statusIndicator.Foreground = new SolidColorBrush(
+                            pingResult ? Color.FromArgb(0xFF, 0x00, 0xFF, 0x00) : Color.FromArgb(0xFF, 0xFF, 0x00, 0x00));
+                        statusIndicator.Text = pingResult ? "OK" : "BAD";
+                        
+                        //update prgress Bar
+                        TimeoutProgressBar.Value = CountPingLosses(_last15Results);
+
+                        //Check if progress Bar (ping loss) is more than slider
+                        if (TimeoutProgressBar.Value >= Tolerance_Input.Value)
+                        {
+                            if (ProtectionToggle.Content == "ON")
+                            {
+                                whatHappensWhenPingBad();
+                            }
+                        }
+
+                        //update timeouts 100
+                        int totalPings = _last100Results.Count;
+                        int failedPings = CountPingLosses(_last100Results);
+
+                        double lossPercent = totalPings == 0 ? 0 : (double)failedPings / totalPings * 100;
+
+                        timeout100.Content = lossPercent.ToString("F1") + "%";
+
+                        //Based on timouts100, controll the status of pings
+                        if (lossPercent < 10)
+                        {
+                            timeout100.Background = new SolidColorBrush(Colors.Green);
                         }
                         else
                         {
-                            target.PingValue = "Timeout";
-                            target.StatusColor = Brushes.Red;
-                            target.TimeoutTimestamps.Enqueue(DateTime.Now);
+                            timeout100.Background = new SolidColorBrush(Colors.Red);
                         }
-                        OnPropertyChanged(nameof(PingTargets));
+
                     });
                 }
-                catch (PingException)
-                {
-                    await Application.Current.Dispatcher.InvokeAsync(() =>
-                    {
-                        target.PingValue = "Error";
-                        target.StatusColor = Brushes.Red;
-                        OnPropertyChanged(nameof(PingTargets));
-                    });
-                }
-                catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
-                {
-                    break;
-                }
-
-                await Task.Delay(1000 - (initialDelay % 1000), cancellationToken);
-            }
-        }
-
-        private void StopPinging()
-        {
-            _pingCancellationTokenSource?.Cancel();
-            _isPinging = false;
-        }
-
-        private void StopPinging_Click(object sender, RoutedEventArgs e)
-        {
-            StopPinging();
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            StopPinging();
-            _timeoutUpdateTimer.Stop();
-            _timerManager?.StopTimer();
-            _loopPlayer?.Stop();
-        }
-
-        private void UpdateTimeoutProgress(object sender, EventArgs e)
-        {
-            if (_isPingingStopped)
-            {
-                TimeoutProgressBar.Value = _frozenTimeoutCount;
-                TimeoutLabel.Text = $"{_frozenTimeoutCount} timeouts (pinging stopped)";
-                return;
-            }
-
-            // Update threshold
-            if (int.TryParse(Tolerance_Input.Text, out int threshold))
-            {
-                _timeoutThreshold = threshold;
             }
             else
             {
-                _timeoutThreshold = 6;
-                Tolerance_Input.Text = "6";
+                Dispatcher.Invoke(() =>
+                {
+                    StatusIndicator0.Text = "Stand by";
+                    StatusIndicator0.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x40, 0x40, 0x40));
+                    StatusIndicator1.Text = "Stand by";
+                    StatusIndicator1.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x40, 0x40, 0x40));
+                    StatusIndicator2.Text = "Stand by";
+                    StatusIndicator2.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x40, 0x40, 0x40));
+                    StatusIndicator3.Text = "Stand by";
+                    StatusIndicator3.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x40, 0x40, 0x40));
+                    StatusIndicator4.Text = "Stand by";
+                    StatusIndicator4.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x40, 0x40, 0x40));
+                });
             }
 
-            // Count adapters
-            adapters_Count.Text = $"Number of active Ethernet adapters: {GetNumberOfActiveEthernetAdapters()}";
+            // Safely update other UI elements
+            Dispatcher.Invoke(() => status_tools());
+        }
 
-            // Count timeouts
-            int timeoutCount = 0;
-            DateTime now = DateTime.Now;
-            DateTime cutoffTime = now.AddSeconds(-TimeoutWindowSeconds);
 
-            foreach (var target in PingTargets)
+        // Updates the button color based on "pinging"
+        private void status_tools()
+        {
+            //Is it pinging?
+            if (pinging)
             {
-                while (target.TimeoutTimestamps.TryPeek(out DateTime oldest) && oldest < cutoffTime)
+                btn_pinging.Background = new SolidColorBrush(Colors.Green);
+                btn_pinging.Content = "ON";
+            }
+            else
+            {
+                btn_pinging.Background = new SolidColorBrush(Colors.Red);
+                btn_pinging.Content = "OFF";
+            }
+
+            //How many ethernet
+            if (GetEnabledEthernetAdapterCount() < 2)
+            {
+                ActiveAdaptersLabel.Background = new SolidColorBrush(Colors.Red);
+                ActiveAdaptersLabel.Content = GetEnabledEthernetAdapterCount();
+            }
+            else
+            {
+                ActiveAdaptersLabel.Background = new SolidColorBrush(Colors.Green);
+                ActiveAdaptersLabel.Content = GetEnabledEthernetAdapterCount();
+            }
+
+            //Killing chrome are we?
+            if ((bool)KillChromeToggle.IsChecked)
+            {
+                status_killchrome.Background = new SolidColorBrush(Colors.Green);
+                status_killchrome.Content = "ON";
+            }
+            else
+            {
+                status_killchrome.Background = new SolidColorBrush(Colors.Red);
+                status_killchrome.Content = "OFF";
+            }
+        }
+
+
+        //Here we check what happens and what to kill
+        private void whatHappensWhenPingBad()
+        {
+            bool protectionEnabled = ProtectionToggle.Content.ToString() == "ON";
+            bool shouldKillChrome = KillChromeToggle.IsChecked ?? false;
+            string soundPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "alert.wav");
+
+            if (protectionEnabled)
+            {
+                SetEthernetState(false);
+                ProtectionToggle.IsChecked = false;
+                ProtectionToggle.Content = "Paused";
+
+                if (File.Exists(soundPath))
                 {
-                    target.TimeoutTimestamps.TryDequeue(out _);
+                    PlaySound(soundPath);
                 }
 
-                timeoutCount += target.TimeoutTimestamps.Count;
+                if (shouldKillChrome)
+                {
+                    KillChrome();
+                }
             }
 
-            TimeoutProgressBar.Value = timeoutCount;
-            TimeoutProgressBar.Maximum = PingTargets.Count * TimeoutWindowSeconds;
-            TimeoutLabel.Text = $"{timeoutCount} timeouts in last {TimeoutWindowSeconds}s";
-
-            if (timeoutCount > _timeoutThreshold)
-            {
-                ((MainWindow)Application.Current.MainWindow).ToggleEthernetAdapter("Ethernet", enable: false);
-                if (!_hasPlayedSound)
+            if (ReconnectBTN.Content != "OFF") {
+                // Start a timer for 90 seconds (90,000 milliseconds)
+                DispatcherTimer timer = new DispatcherTimer();
+                timer.Interval = TimeSpan.FromSeconds(1);
+                timer.Tick += (sender, args) =>
                 {
-                    _hasPlayedSound = true;
-                    _frozenTimeoutCount = timeoutCount;
-                    StopPinging();
-                    _isPingingStopped = true;
-                    _timerManager.StartTimer();
-                    PlayAlertThenStartLoop();
-                    if (killChrome.IsChecked == true)
+                    totalSeconds--;
+
+                    ReconnectBTN.Content = $"({totalSeconds}s)";
+
+                    if (totalSeconds <= 0)
                     {
-                        CloseChrome();
+                        totalSeconds = 90;
+                        timer.Stop();
+                        ReconnectBTN.Content = "ON";
+                        ReconnectionFunction();
                     }
-
-                }
+                };
+                timer.Start();
             }
         }
 
-        private async void PlayAlertThenStartLoop()
+        //this function is called to re enable ethernet 1
+        public void ReconnectionFunction()
         {
-            var alertPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "alert.wav");
-            var loopPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", "loop.wav");
+            //Internet is back
+            SetEthernetState(true);
 
-            if (File.Exists(alertPath))
+            //testing again
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(8);
+            timer.Tick += (s, e) =>
             {
-                using (var alertPlayer = new System.Media.SoundPlayer(alertPath))
-                {
-                    await Task.Run(() => alertPlayer.PlaySync());
-                }
-            }
-
-            if (File.Exists(loopPath))
-            {
-                _loopPlayer = new System.Media.SoundPlayer(loopPath);
-                _loopPlayer.PlayLooping();
-            }
+                timer.Stop();
+                ProtectionToggle.Content = "ON";
+            };
+            timer.Start();
         }
 
-        private void EnableEthernet1_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleEthernetAdapter("Ethernet", enable: true);
-        }
 
-        private void DisableEthernet1_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleEthernetAdapter("Ethernet", enable: false);
-        }
-
-        private void ToggleEthernetAdapter(string adapterName, bool enable)
+        public void PlaySound(string filePath)
         {
             try
             {
-                var query = new SelectQuery($"SELECT * FROM Win32_NetworkAdapter WHERE NetConnectionID = '{adapterName}'");
-                using (var searcher = new ManagementObjectSearcher(query))
+                if (File.Exists(filePath))
                 {
-                    foreach (ManagementObject adapter in searcher.Get())
+                    using (SoundPlayer player = new SoundPlayer(filePath))
                     {
-                        adapter.InvokeMethod(enable ? "Enable" : "Disable", null);
+                        player.Load();
+                        player.PlaySync();
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to {(enable ? "enable" : "disable")} adapter: {ex.Message}");
-            }
+            catch { }
         }
 
-        public static int GetNumberOfActiveEthernetAdapters()
+        //Button click on start pinging or stop it
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            int activeEthernetCount = 0;
-            NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
-
-            foreach (NetworkInterface adapter in interfaces)
+            if (pinging == true)
             {
-                if (adapter.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
-                    adapter.OperationalStatus == OperationalStatus.Up)
-                {
-                    activeEthernetCount++;
-                }
+                pinging = false;
+                btn_start_pinging.Content = "Start Pinging";
             }
-
-            return activeEthernetCount;
+            else
+            {
+                pinging = true;
+                btn_start_pinging.Content = "Stop Pinging";
+            }
         }
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        //Toggled buttons: Ethernet
+        private void ProtectionToggle_Click(object sender, RoutedEventArgs e)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (ProtectionToggle.Content == "OFF" || ProtectionToggle.Content == "Paused")
+            {
+                ProtectionToggle.Content = "ON";
+            }
+            else
+            {
+                ProtectionToggle.Content = "OFF";
+            }
         }
 
-        private class TimerManager
+        //Toggled buttons: Reconnect
+        private void ReconnectBTN_Click(object sender, RoutedEventArgs e)
         {
-            private readonly ProgressBar _progressBar;
-            private readonly TextBlock _textBlock;
-            private DispatcherTimer _timer;
-            private int _secondsRemaining;
-            private const int TotalSeconds = 120;
-
-            public TimerManager(ProgressBar progressBar)
+            if (ReconnectBTN.Content == "OFF" || ReconnectBTN.Content == "Paused")
             {
-                _progressBar = progressBar;
-                InitializeTimer();
+                ReconnectBTN.Content = "ON";
             }
-
-            private void InitializeTimer()
+            else
             {
-                _progressBar.Value = 0;
-                _progressBar.Maximum = TotalSeconds;
-                _secondsRemaining = TotalSeconds;
-            }
-
-            public void StartTimer()
-            {
-                if (_timer == null)
-                {
-                    _timer = new DispatcherTimer();
-                    _timer.Interval = TimeSpan.FromSeconds(1);
-                    _timer.Tick += Timer_Tick;
-                }
-
-                if (!_timer.IsEnabled)
-                {
-                    InitializeTimer();
-                    _timer.Start();
-                }
-            }
-
-            //We reached the 120 sec here
-            public void StopTimer()
-            {
-                if (Application.Current?.MainWindow is MainWindow mainWindow)
-                {
-                    mainWindow.StartPinging();
-                }
-                _timer?.Stop();
-            }
-
-            private void Timer_Tick(object sender, EventArgs e)
-            {
-                _secondsRemaining--;
-                _progressBar.Value = TotalSeconds - _secondsRemaining;
-
-                TimeSpan time = TimeSpan.FromSeconds(_secondsRemaining);
-
-                //Enabling ethernet based on timer
-                if (_secondsRemaining <= 3)
-                {
-                    ((MainWindow)Application.Current.MainWindow).ToggleEthernetAdapter("Ethernet", enable: true);
-                }
-
-                if (_secondsRemaining <= 0)
-                {
-                    StopTimer();
-                }
+                ReconnectBTN.Content = "OFF";
             }
         }
 
-        public static void CloseChrome()
+        //Enable or disable the ethernet
+        private async void EthernetToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (EnableDisableEthernet.Content == "Enabled")
+            {
+                EnableDisableEthernet.Content = "Working";
+                SetEthernetState(false);
+            }
+            else if (EnableDisableEthernet.Content == "Disabled")
+            {
+                EnableDisableEthernet.Content = "Working";
+                ProtectionToggle.Content = "Paused";
+                pinging = false;
+                _last15Results.Clear();
+                SetEthernetState(true);
+
+                await Task.Delay(8000);
+                ProtectionToggle.Content = "ON";
+                pinging = true;
+            }
+        }
+
+        private void ChromeKill_Click(object sender, RoutedEventArgs e)
+        {
+            if ((bool)KillChromeToggle.IsChecked)
+            {
+                KillChromeToggle.Content = "ON";
+            }
+            else
+            {
+                KillChromeToggle.Content = "OFF";
+            }
+        }
+
+        public static int GetEnabledEthernetAdapterCount()
+        {
+            return NetworkInterface.GetAllNetworkInterfaces()
+                .Where(ni =>
+                    ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+                    ni.OperationalStatus == OperationalStatus.Up)
+                .Count();
+        }
+
+        public bool PingAddress(string address)
         {
             try
             {
-                Process[] chromeProcesses = Process.GetProcessesByName("chrome");
-
-                if (chromeProcesses.Length == 0)
+                using (Ping ping = new Ping())
                 {
-                    Console.WriteLine("No Chrome process found.");
-                    return;
-                }
+                    PingReply reply = ping.Send(address, 100);
+                    long pingValue = reply.RoundtripTime;
 
-                foreach (Process process in chromeProcesses)
-                {
-                    try
+                    // Safe UI update
+                    Dispatcher.Invoke(() =>
                     {
-                        if (!process.HasExited)
+                        if (pingValue > 2)
                         {
-                            process.Kill();
-                            // Optional: wait for it to close with timeout
-                            process.WaitForExit(5000); // Wait up to 5 seconds
-                            Console.WriteLine("Chrome process terminated.");
+                            PingUI.Text = $"{pingValue} ms";
                         }
-                    }
-                    catch (Win32Exception ex)
-                    {
-                        Console.WriteLine($"Could not terminate process (Win32): {ex.Message}");
-                    }
-                    catch (InvalidOperationException ex)
-                    {
-                        Console.WriteLine($"Process already exited: {ex.Message}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error terminating process: {ex.Message}");
-                    }
-                    finally
-                    {
-                        process.Dispose();
-                    }
+                    });
+
+                    return reply.Status == IPStatus.Success;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+        private void AddPingResult(bool result)
+        {
+            if (_last15Results.Count == 15) _last15Results.Dequeue();
+            _last15Results.Enqueue(result);
+
+            if (_last100Results.Count == 100) _last100Results.Dequeue();
+            _last100Results.Enqueue(result);
+        }
+
+        private int CountPingLosses(Queue<bool> results)
+        {
+            return results.Count(r => !r);
+        }
+
+        public static string CheckEthernetStatus()
+        {
+            try
+            {
+                var adapters = NetworkInterface.GetAllNetworkInterfaces();
+                var ethernetAdapter = adapters.FirstOrDefault(ni =>
+                    ni.Name.Equals("Ethernet", StringComparison.OrdinalIgnoreCase) ||
+                    ni.Description.Contains("Ethernet", StringComparison.OrdinalIgnoreCase));
+
+                if (ethernetAdapter == null)
+                    return "Disabled"; // Not found
+
+                if (ethernetAdapter.OperationalStatus == OperationalStatus.Up)
+                    return "Enabled";
+                else
+                    return "Disabled";
+            }
+            catch
+            {
+                return "Disabled";
+            }
+        }
+
+        //Function to enable or disable
+        public static void SetEthernetState(bool enable, string adapterName = "Ethernet")
+        {
+            string action = enable ? "enable" : "disable";
+
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = "netsh",
+                Arguments = $"interface set interface \"{adapterName}\" {action}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                Verb = "runas" // Runs with admin privileges
+            };
+
+            try
+            {
+                using (Process process = Process.Start(psi))
+                {
+                    process.WaitForExit();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+
+                    if (process.ExitCode == 0)
+                        Console.WriteLine($"Adapter '{adapterName}' {action}d successfully.");
+                    else
+                        Console.WriteLine($"Failed to {action} adapter '{adapterName}': {error}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unexpected error in CloseChrome: {ex.Message}");
+                Console.WriteLine("Exception: " + ex.Message);
+            }
+    }
+        public static void KillChrome()
+        {
+            try
+            {
+                Process[] chromeInstances = Process.GetProcessesByName("chrome");
+
+                foreach (Process chrome in chromeInstances)
+                {
+                    chrome.Kill();
+                    chrome.WaitForExit();
+                }
+
+                Console.WriteLine($"Killed {chromeInstances.Length} chrome.exe process(es).");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error killing Chrome: " + ex.Message);
             }
         }
+
     }
 
-    public class PingTarget : INotifyPropertyChanged
-    {
-        public PingTarget()
-        {
-            TimeoutTimestamps = new ConcurrentQueue<DateTime>();
-        }
 
-        public ConcurrentQueue<DateTime> TimeoutTimestamps { get; }
-
-        private string _name;
-        public string Name
-        {
-            get => _name;
-            set { _name = value; OnPropertyChanged(nameof(Name)); }
-        }
-
-        private string _ipAddress;
-        public string IpAddress
-        {
-            get => _ipAddress;
-            set { _ipAddress = value; OnPropertyChanged(nameof(IpAddress)); }
-        }
-
-        private string _pingValue = "-";
-        public string PingValue
-        {
-            get => _pingValue;
-            set { _pingValue = value; OnPropertyChanged(nameof(PingValue)); }
-        }
-
-        private Brush _statusColor = Brushes.Gray;
-        public Brush StatusColor
-        {
-            get => _statusColor;
-            set { _statusColor = value; OnPropertyChanged(nameof(StatusColor)); }
-        }
-
-        private bool _isEnabled = true;
-        public bool IsEnabled
-        {
-            get => _isEnabled;
-            set { _isEnabled = value; OnPropertyChanged(nameof(IsEnabled)); }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
 }

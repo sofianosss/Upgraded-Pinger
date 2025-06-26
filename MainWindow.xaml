@@ -5,79 +5,634 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Upgraded_Pinger"
         mc:Ignorable="d"
-        Title="Upgraded Pinger" Height="400" Width="400"
-        Closed="Window_Closed">
+                Title="MainWindow" Height="500" Width="400">
     <Grid>
-        <!-- Purple-Blue Gradient Background -->
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#FF6E00FF" Offset="0"/>
-                <GradientStop Color="#FF0038FF" Offset="1"/>
+            <LinearGradientBrush EndPoint="-0.24,0.02" StartPoint="0.346,-0.632">
+                <LinearGradientBrush.RelativeTransform>
+                    <TransformGroup>
+                        <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                        <SkewTransform CenterX="0.5" CenterY="0.5"/>
+                        <RotateTransform CenterX="0.5" CenterY="0.5"/>
+                        <TranslateTransform X="0.505" Y="0.768"/>
+                    </TransformGroup>
+                </LinearGradientBrush.RelativeTransform>
+                <GradientStop Color="#FF2B2B2B"/>
+                <GradientStop Color="#FF4F4F4F" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
+        <Grid HorizontalAlignment="Center" Height="514" VerticalAlignment="Top" Width="380" Grid.Row="4">
+            <Grid HorizontalAlignment="Center" Height="80" Margin="0,130,0,0" VerticalAlignment="Top" Width="380">
 
-        <!-- Main Content Container -->
-        <StackPanel Margin="5" VerticalAlignment="Center">
-         <!-- Input Fields Section -->
-            <ItemsControl ItemsSource="{Binding PingTargets}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="0,0">
-                            <!-- Name Label -->
-                            <Label Content="{Binding Name}" Width="100" Foreground="White" FontWeight="Bold"/>
+                <!-- ######## Button status timeouts  #################-->
+                <Button x:Name="timeout100" Content="0%" HorizontalAlignment="Left" Height="80" VerticalAlignment="Center" Width="91" Margin="288,0,0,0"
+                        Background="#FF0E6A12" Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="DarkGray" BorderThickness="2" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
 
-                            <!-- IP Address TextBox -->
-                            <TextBox Text="{Binding IpAddress}" Width="160" Height="18" Margin="5,0" Padding="0" IsEnabled="{Binding IsEnabled}" FontSize="10"/>
+                <!-- ######## Button status Ethernet  #################-->
+                <Button x:Name="ActiveAdaptersLabel" Content="2" HorizontalAlignment="Left" Height="80" VerticalAlignment="Center" Width="91" Margin="96,0,0,0"
+                        Background="#FF0E6A12" Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="DarkGray"  BorderThickness="2" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
 
-                            <!-- Ping Value Label -->
-                            <Label Content="{Binding PingValue}" Width="60" Foreground="White" Margin="0,0" 
-                                   HorizontalContentAlignment="Right" FontWeight="Bold"/>
 
-                            <!-- Status Indicator -->
-                            <Ellipse Width="12" Height="12" Margin="5,0" Fill="{Binding StatusColor}" 
-                                     Stroke="White" StrokeThickness="1"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                <!-- ######## Button status chrome  #################-->
+                <Button x:Name="status_killchrome" Content="ON" HorizontalAlignment="Left" Height="80" VerticalAlignment="Center" Width="91" Margin="192,0,0,0"
+                        Background="#FF0E6A12" Foreground="White"  FontSize="18" FontWeight="Bold" BorderBrush="DarkGray"  BorderThickness="2" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
 
-            <!-- Buttons Section -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
-                <Button Content="Start" Width="70" Height="30" Margin="5,0" 
-            Background="#782196F3" Foreground="White" Click="StartPinging_Click"/>
-                <Button Content="Stop" Width="70" Height="30" Margin="5,0" 
-            Background="#782196F3" Foreground="White" Click="StopPinging_Click"/>
-                <Button Content="Enable" Width="70" Height="30" Margin="5,0" 
-            Background="#FF2196F3" Foreground="White" Click="EnableEthernet1_Click"/>
-                <Button Content="Disable" Width="70" Height="30" Margin="5,0" 
-            Background="#FF2196F3" Foreground="White" Click="DisableEthernet1_Click"/>
+                <!-- ######## Button status pinging  #################-->
+                <Button x:Name="btn_pinging" Content="ON" HorizontalAlignment="Left" Height="80" VerticalAlignment="Center" Width="91"
+                        Background="#FF0E6A12" Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="DarkGray"  BorderThickness="2" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+
+            <Grid HorizontalAlignment="Center" Height="77" Margin="0,226,0,0" VerticalAlignment="Top" Width="380">
+                <!-- ######### Slider for Tolerance ######### -->
+                <Slider HorizontalAlignment="Left" 
+                        x:Name ="Tolerance_Input"
+                        Height="30" 
+                        Width="198"
+                        Minimum="1" 
+                        Maximum="14" 
+                        Value="6"
+                        Background="Transparent"
+                        Foreground="#FFBB4912"
+                        BorderThickness="0"
+                        Padding="5" 
+                        Margin="172,47,0,0">
+                    <Slider.Resources>
+                        <Style TargetType="Thumb">
+                            <Setter Property="Height" Value="20"/>
+                            <Setter Property="Width" Value="20"/>
+                            <Setter Property="Background" Value="#FFBB4912"/>
+                            <Setter Property="BorderBrush" Value="#FF7A3008"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="0" Opacity="0.3"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
+                        <Style TargetType="Track">
+                            <Setter Property="Height" Value="8"/>
+                        </Style>
+                    </Slider.Resources>
+                    <Slider.Effect>
+                        <DropShadowEffect Color="Black" BlurRadius="3" ShadowDepth="0" Opacity="0.2"/>
+                    </Slider.Effect>
+                </Slider>
+
+                <!-- ######## progress bar timeouts in last 3 sec  #################-->
+                <ProgressBar HorizontalAlignment="Left" 
+                             x:Name ="TimeoutProgressBar"
+                             Height="21" 
+                             Margin="172,10,0,0" 
+                             VerticalAlignment="Top" 
+                             Width="198"
+                             Minimum="0" 
+                             Maximum="15" 
+                             Value="60"
+                             Foreground="#FFBB4912"
+                             Background="Black"
+                             BorderBrush="DarkGray" 
+                             BorderThickness="2"/>
+            </Grid>
+
+            <Grid HorizontalAlignment="Center" Height="120" Margin="0,6,0,0" VerticalAlignment="Top" Width="380">
+                <Grid HorizontalAlignment="Left" Height="100" VerticalAlignment="Center" Width="190">
+
+                    <!--######### START PINGING BUITON ########## -->
+                    <Button Content="Start Pinging"
+                            x:Name ="btn_start_pinging"
+                            Width="182"
+                            Height="100"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Background="#FF1A1A1A"
+                            Foreground="White"
+                            FontWeight="Bold"
+                            FontSize="24"
+                            BorderBrush="DarkGray" 
+                            BorderThickness="2"
+                            Padding="10"
+                            Cursor="Hand" Click="Button_Click">
+
+                       
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border 
+                                                Background="{TemplateBinding Background}" 
+                                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                                CornerRadius="10"
+                                                SnapsToDevicePixels="True">
+                                                <ContentPresenter 
+                                                    HorizontalAlignment="Center" 
+                                                    VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+
+                                <!-- Hover effect -->
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#FF3399FF"/>
+                                        <Setter Property="BorderBrush" Value="#FF1A75CF"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" Value="#FF005A9E"/>
+                                        <Setter Property="BorderBrush" Value="#FF003F7F"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <TextBlock Text="--"
+                               x:Name ="PingUI"
+                               Margin="0,60,0,0" 
+                               Width="100"
+                               Height="25"
+                               FontSize="20"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Foreground="White"
+                               FontWeight="Bold"/>
+
+                </Grid>
+
+                <Grid HorizontalAlignment="Left" Height="25" Margin="190,0,0,0" VerticalAlignment="Top" Width="190">
+                    <TextBlock Text="Protection"
+                               Width="100"
+                               Height="25"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               TextAlignment="Right"
+                               TextWrapping="Wrap"
+                               Foreground="White"
+                               FontWeight="Bold"/>
+
+                    <!-- ######## Button For Protection on or off #################-->
+                    <ToggleButton Width="85"
+                                  x:Name ="ProtectionToggle"
+                                 Height="24"
+                                 Margin="105,0,0,0"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Center"
+                                 Content="ON"
+                                 Background="#FF007ACC"
+                                 Foreground="White"
+                                 FontWeight="SemiBold"
+                                 BorderBrush="#FF005A9E"
+                                 BorderThickness="1"
+                                 Padding="4,0" Click="ProtectionToggle_Click">
+                    </ToggleButton>
+                </Grid>
+
+                <Grid HorizontalAlignment="Left" Height="25" Margin="190,30,0,0" VerticalAlignment="Top" Width="190">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64*"/>
+                        <ColumnDefinition Width="31*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- ######## Button For Etherner on or off #################-->
+                    <ToggleButton Width="85"
+                                  x:Name="EnableDisableEthernet"
+                                 Height="24"
+                                 Margin="105,0,0,0"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Center"
+                                 Content="ON"
+                                 Background="#FF007ACC"
+                                 Foreground="White"
+                                 FontWeight="SemiBold"
+                                 BorderBrush="#FF005A9E"
+                                 BorderThickness="1"
+                                 Padding="4,0"
+                                 Click="EthernetToggle_Click" Grid.ColumnSpan="2"/>
+                    <TextBlock Text="Ethernet"
+                               Width="100"
+                               Height="25"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               TextAlignment="Right"
+                               TextWrapping="Wrap"
+                               Foreground="White"
+                               FontWeight="Bold"/>
+                </Grid>
+
+                <Grid HorizontalAlignment="Left" Height="25" Margin="190,60,0,0" VerticalAlignment="Top" Width="190">
+
+                    <!-- ######## Button For Closing chrome on or off #################-->
+                    <ToggleButton Width="85"
+                                  x:Name ="KillChromeToggle"
+                                 Height="24"
+                                 Margin="105,0,0,0"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Center"
+                                 Content="ON"
+                                 Background="#FF007ACC"
+                                 Foreground="White"
+                                 FontWeight="SemiBold"
+                                 BorderBrush="#FF005A9E"
+                                 BorderThickness="1"
+                                 Padding="4,0"
+                                  Click="ChromeKill_Click"/>
+                    <TextBlock Text="Close Chrome"
+                               Width="100"
+                               Height="25"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               TextAlignment="Right"
+                               TextWrapping="Wrap"
+                               Foreground="White"
+                               FontWeight="Bold"/>
+                </Grid>
+
+
+                <Grid HorizontalAlignment="Left" Height="25" Margin="190,90,0,0" VerticalAlignment="Top" Width="190">
+
+                    <!-- ######## Button For Closing chrome on or off #################-->
+                    <ToggleButton Width="85"
+                                  x:Name ="ReconnectBTN"
+                                 Height="24"
+                                 Margin="105,0,0,0"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Center"
+                                 Content="ON"
+                                 Background="#FF007ACC"
+                                 Foreground="White"
+                                 FontWeight="SemiBold"
+                                 BorderBrush="#FF005A9E"
+                                 BorderThickness="1"
+                                 Padding="4,0"
+                                  Click="ReconnectBTN_Click"/>
+                    <TextBlock Text="Reconnect"
+                               Width="100"
+                               Height="25"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               TextAlignment="Right"
+                               TextWrapping="Wrap"
+                               Foreground="White"
+                               FontWeight="Bold"/>
+                </Grid>
+            </Grid>
+
+            <TextBlock Text="Pinging"
+                       Width="92"
+                       Height="25"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="White"
+                       FontWeight="Bold" 
+                       Margin="0,187,0,0"/>
+
+            <TextBlock Text="Ethernet"
+                       Width="92"
+                       Height="25"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="White"
+                       FontWeight="Bold" 
+                       Margin="98,187,0,0"/>
+
+            <TextBlock Text="Chrome"
+                       Width="92"
+                       Height="25"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="White"
+                       FontWeight="Bold" 
+                       Margin="190,187,0,0"/>
+
+            <TextBlock Text="Timeouts"
+                       Width="92"
+                       Height="25"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="White"
+                       FontWeight="Bold" 
+                       Margin="288,187,0,0"/>
+
+            <TextBlock Text="Timeouts in last 3 sec"
+                       Width="156"
+                       Height="25"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="White"
+                       FontWeight="Bold" 
+                       Margin="10,234,0,0"/>
+
+            <TextBlock Text="Tolerance for failed pings"
+                       Width="156"
+                       Height="25"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="White"
+                       FontWeight="Bold" 
+                       Margin="10,264,0,0"/>
+        </Grid>
+
+        <Grid HorizontalAlignment="Center" Height="150" Margin="0,300,0,0" VerticalAlignment="Top" Width="380 ">
+            <StackPanel>
+
+                <!-- Google -->
+                <Border Height="30" Background="#FF1A1A1A" BorderBrush="#FF333333" BorderThickness="0,1,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Google" 
+                   Grid.Column="0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="White"
+                   Margin="5,0"/>
+
+                        <Rectangle Grid.Column="1" 
+                   Width="1" 
+                   Fill="#FF333333" 
+                   Margin="0,5"/>
+
+                        <TextBlock Text="8.8.8.8"
+                                   x:Name="adressIP1"
+                   Grid.Column="2"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="White"
+                   Margin="5,0"/>
+
+                        <Rectangle Grid.Column="3" 
+                   Width="1" 
+                   Fill="#FF333333" 
+                   Margin="0,5"/>
+
+                        <TextBlock x:Name="StatusIndicator0" 
+                   Text="Ready" 
+                   Grid.Column="4"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="#FF00FF00"
+                   FontWeight="Bold"/>
+                    </Grid>
+                </Border>
+
+
+
+                <!-- Steam -->
+                <Border Height="30" Background="#FF1A1A1A" BorderBrush="#FF333333" BorderThickness="0,1,0,0">
+                    <Grid Margin="0,-3,0,3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="69*"/>
+                            <ColumnDefinition Width="64*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="133*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="133*"/>
+                        </Grid.ColumnDefinitions>
+
+
+                        <TextBlock Text="Steam" 
+                Grid.Column="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="White" Grid.ColumnSpan="2"/>
+
+                        <Rectangle Grid.Column="2" 
+                Width="1" 
+                Fill="#FF333333" 
+                Margin="0,5,132,5" Grid.ColumnSpan="2"/>
+
+                        <TextBlock Text="store.steampowered.com" 
+                              x:Name="adressIP2"
+                TextAlignment="Right"
+                Grid.Column="3"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="White"/>
+
+                        <Rectangle Grid.Column="3" 
+                Width="1" 
+                Fill="#FF333333" 
+                Margin="132,5,0,5" Grid.ColumnSpan="2"/>
+
+                        <TextBlock x:Name="StatusIndicator1" 
+                Text="Ready" 
+                Grid.Column="5"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="#FF00FF00"
+                FontWeight="Bold"/>
+                    </Grid>
+                </Border>
+
+                <!-- Xbox -->
+                <Border Height="30" Background="#FF1A1A1A" BorderBrush="#FF333333" BorderThickness="0,1,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="OpenDNS" 
+                Grid.Column="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="White"
+                Margin="5,0"/>
+
+                        <Rectangle Grid.Column="1" 
+                Width="1" 
+                Fill="#FF333333" 
+                Margin="0,5"/>
+
+                        <TextBlock Text="20.236.44.162"
+                               x:Name="adressIP3"
+                Grid.Column="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="White"
+                Margin="5,0"/>
+
+                        <Rectangle Grid.Column="3" 
+                Width="1" 
+                Fill="#FF333333" 
+                Margin="0,5"/>
+
+                        <TextBlock x:Name="StatusIndicator2" 
+                Text="Ready" 
+                Grid.Column="4"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="#FF00FF00"
+                FontWeight="Bold"/>
+                    </Grid>
+                </Border>
+
+                <!-- Riot -->
+                <Border Height="30" Background="#FF1A1A1A" BorderBrush="#FF333333" BorderThickness="0,1,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Riot" 
+                Grid.Column="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="White"
+                Margin="5,0"/>
+
+                        <Rectangle Grid.Column="1" 
+                Width="1" 
+                Fill="#FF333333" 
+                Margin="0,5"/>
+
+                        <TextBlock Text="104.16.1.5"
+                               x:Name="adressIP4"
+                Grid.Column="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="White"
+                Margin="5,0"/>
+
+                        <Rectangle Grid.Column="3" 
+                Width="1" 
+                Fill="#FF333333" 
+                Margin="0,5"/>
+
+                        <TextBlock x:Name="StatusIndicator3" 
+                Text="Ready" 
+                Grid.Column="4"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="#FF00FF00"
+                FontWeight="Bold"/>
+                    </Grid>
+                </Border>
+
+                <!-- Router -->
+                <Border Height="30" Background="#FF1A1A1A" BorderBrush="#FF333333" BorderThickness="0,1,0,0">
+                    <Grid Margin="0,-3,0,3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Router" 
+                Grid.Column="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="White"
+                Margin="5,0"/>
+
+                        <Rectangle Grid.Column="1" 
+                Width="1" 
+                Fill="#FF333333" 
+                Margin="0,5"/>
+
+                        <TextBlock Text="192.168.1.1" 
+                               x:Name="adressIP5"
+                Grid.Column="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="White"
+                Margin="5,0"/>
+
+                        <Rectangle Grid.Column="3" 
+                Width="1" 
+                Fill="#FF333333" 
+                Margin="0,5"/>
+
+                        <TextBlock x:Name="StatusIndicator4" 
+                Text="Ready" 
+                Grid.Column="4"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="#FF00FF00"
+                FontWeight="Bold"/>
+                    </Grid>
+                </Border>
             </StackPanel>
-
-            <TextBlock x:Name="adapters_Count" Text="Number on active Ethernet adapters:" Foreground="White" HorizontalAlignment="Center"/>
-
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
-                <!-- Timeout Counter Display -->
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,5">
-                    <TextBlock Text="Tolerance" Foreground="White" HorizontalAlignment="Center"/>
-                    <TextBox x:Name="Tolerance_Input" TextAlignment="Center" Text="6" Width="60" Margin="10,0" Padding="5" HorizontalAlignment="Center"/>
-                    <CheckBox x:Name="killChrome" Foreground="White" FontSize="8" Content="Kill Chrome" HorizontalAlignment="Center" IsChecked="True"/>
-
-
-                </StackPanel>
-                <!-- Timeout Counter Display -->
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,5" Background="#d17615">
-                <TextBlock Text="Timeouts (last 3s)" Foreground="White" HorizontalAlignment="Center"/>
-                <ProgressBar x:Name="TimeoutProgressBar" Width="280" Height="20" Maximum="15" Value="0" Margin="10,5,10,5"/>
-                <TextBlock x:Name="TimeoutLabel" Foreground="White" HorizontalAlignment="Center"/>
-            </StackPanel>
-            </StackPanel>
-
-            <!-- back online timer -->
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,5" Background="#d17615">
-                <TextBlock Text="Timer to reconnect" Foreground="White" HorizontalAlignment="Center"/>
-                <ProgressBar x:Name="TimerToBeBack" Width="350" Height="20" Maximum="120" Value="120" Margin="10,5,10,10"/>
-            </StackPanel>
-        </StackPanel>
+        </Grid>
     </Grid>
 </Window>
